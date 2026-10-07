@@ -8,13 +8,21 @@ was spent today and per category, plus actions to add expenses and incomes.
 
 ## Installation
 
-**HACS:** add this repository as a custom repository (category *Integration*),
-install *Budget Manager* and restart Home Assistant.
+**HACS:**
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Adrian94F&repository=BudgetManager-HA&category=integration)
+
+or add this repository as a custom repository (category *Integration*) by hand.
+Then download *Budget Manager* and restart Home Assistant.
 
 **Manually:** copy `custom_components/budgetmanager` to the `custom_components`
 folder of your Home Assistant configuration and restart.
 
-Then go to *Settings → Devices & services → Add integration → Budget Manager*
+Then add the integration:
+
+[![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=budgetmanager)
+
+or go to *Settings → Devices & services → Add integration → Budget Manager*,
 and enter the server URL, username and password. The password is used once to
 sign in; only a refresh token is stored. If Home Assistant stays offline for
 longer than the token lives (7 days), it asks you to sign in again.
@@ -80,3 +88,14 @@ actions:
 ```
 
 A sample dashboard is in [examples/dashboard.yaml](examples/dashboard.yaml).
+
+## Releasing
+
+```bash
+./release.sh patch   # or minor, major, or an explicit X.Y.Z
+```
+
+The script bumps `version` in `manifest.json`, commits, tags `vX.Y.Z` and
+pushes; the *Release* workflow then publishes the GitHub release, which HACS
+offers as an update. Run `./release.sh 0.1.0` for the first release: it tags
+the current version without bumping it.
