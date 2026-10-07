@@ -95,6 +95,13 @@ A sample dashboard is in [examples/dashboard.yaml](examples/dashboard.yaml).
 ./release.sh patch   # or minor, major, or an explicit X.Y.Z
 ```
 
+On Windows run it from Git Bash; in PowerShell, `bash` is usually WSL's,
+whose git lacks your identity and GitHub credentials:
+
+```powershell
+& "C:\Program Files\Git\bin\bash.exe" release.sh patch
+```
+
 The script bumps `version` in `manifest.json`, commits, tags `vX.Y.Z` and
 pushes; the *Release* workflow then publishes the GitHub release, which HACS
 offers as an update. Run `./release.sh 0.1.0` for the first release: it tags

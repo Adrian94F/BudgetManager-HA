@@ -13,6 +13,13 @@ die() { echo "error: $*" >&2; exit 1; }
 
 [ $# -eq 1 ] || die "usage: $0 <patch|minor|major|X.Y.Z>"
 
+# On Windows, a bare `bash` may be WSL's, whose git has neither the
+# Windows git identity nor its GitHub credentials.
+if [ -z "$(git config user.name)" ] || [ -z "$(git config user.email)" ]; then
+    die "git has no user.name/user.email here; on Windows run the script from Git Bash:
+  & \"C:\\Program Files\\Git\\bin\\bash.exe\" release.sh patch"
+fi
+
 [ "$(git branch --show-current)" = "$BRANCH" ] || die "not on $BRANCH"
 [ -z "$(git status --porcelain)" ] || die "the working tree has uncommitted changes"
 git fetch --quiet --tags origin
