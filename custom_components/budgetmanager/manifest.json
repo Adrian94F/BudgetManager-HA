@@ -1,0 +1,12 @@
+{
+  "domain": "budgetmanager",
+  "name": "Budget Manager",
+  "codeowners": ["@Adrian94F"],
+  "config_flow": true,
+  "documentation": "https://github.com/Adrian94F/BudgetManager-HA",
+  "integration_type": "service",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/Adrian94F/BudgetManager-HA/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}

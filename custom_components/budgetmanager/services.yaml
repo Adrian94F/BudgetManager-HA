@@ -1,0 +1,56 @@
+add_expense:
+  fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: budgetmanager
+    value:
+      required: true
+      example: 42.50
+      selector:
+        number:
+          min: 0.01
+          max: 1000000
+          step: 0.01
+          mode: box
+    category:
+      required: true
+      example: Food
+      selector:
+        text:
+    comment:
+      selector:
+        text:
+    date:
+      selector:
+        date:
+    is_monthly:
+      default: false
+      selector:
+        boolean:
+
+add_income:
+  fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: budgetmanager
+    value:
+      required: true
+      example: 5000
+      selector:
+        number:
+          min: 0.01
+          max: 1000000
+          step: 0.01
+          mode: box
+    comment:
+      selector:
+        text:
+    date:
+      selector:
+        date:
+    is_salary:
+      default: false
+      selector:
+        boolean:

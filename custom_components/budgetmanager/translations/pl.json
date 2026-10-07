@@ -1,0 +1,95 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Połącz z Budget Manager",
+        "data": {
+          "url": "Adres serwera",
+          "username": "Nazwa użytkownika",
+          "password": "Hasło",
+          "verify_ssl": "Weryfikuj certyfikat SSL"
+        },
+        "data_description": {
+          "url": "Na przykład https://budget.example.com",
+          "password": "Używane tylko do zalogowania; zapisywany jest jedynie refresh token."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Zaloguj się ponownie",
+        "description": "Sesja użytkownika {username} wygasła. Podaj hasło, aby zalogować się ponownie.",
+        "data": {
+          "password": "Hasło"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Nie udało się połączyć",
+      "invalid_auth": "Nieprawidłowa nazwa użytkownika lub hasło",
+      "unknown": "Nieoczekiwany błąd"
+    },
+    "abort": {
+      "already_configured": "To konto jest już skonfigurowane",
+      "reauth_successful": "Zalogowano ponownie"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "balance": { "name": "Bilans" },
+      "max_daily": { "name": "Dzienny limit" },
+      "today_spendings": { "name": "Wydano dzisiaj" },
+      "today_percent": { "name": "Wykorzystanie dziennego limitu" },
+      "days_left": { "name": "Pozostało dni" },
+      "all_incomes": { "name": "Przychody" },
+      "all_expenses": { "name": "Wydatki" },
+      "monthly_expenses": { "name": "Wydatki stałe" },
+      "daily_expenses": { "name": "Wydatki codzienne" },
+      "last_expense": { "name": "Ostatni wydatek" },
+      "average_balance": { "name": "Średni bilans miesięczny" },
+      "category": { "name": "Wydano na {category}" }
+    },
+    "binary_sensor": {
+      "over_budget": { "name": "Przekroczony budżet" },
+      "daily_limit_exceeded": { "name": "Przekroczony dzienny limit" },
+      "server": { "name": "Serwer" }
+    },
+    "number": {
+      "planned_savings": { "name": "Planowane oszczędności" }
+    }
+  },
+  "exceptions": {
+    "no_single_account": {
+      "message": "Wskaż konto Budget Manager: nie skonfigurowano żadnego albo jest ich kilka."
+    },
+    "date_outside_month": {
+      "message": "{date} wypada poza bieżącym miesiącem."
+    },
+    "unknown_category": {
+      "message": "Nie ma kategorii {category}."
+    }
+  },
+  "services": {
+    "add_expense": {
+      "name": "Dodaj wydatek",
+      "description": "Dodaje wydatek do bieżącego miesiąca.",
+      "fields": {
+        "config_entry_id": { "name": "Konto", "description": "Potrzebne tylko przy kilku kontach." },
+        "value": { "name": "Kwota", "description": "Wydana kwota." },
+        "category": { "name": "Kategoria", "description": "Nazwa lub id kategorii." },
+        "comment": { "name": "Komentarz", "description": "Opcjonalna notatka." },
+        "date": { "name": "Data", "description": "Domyślnie dzisiaj." },
+        "is_monthly": { "name": "Stały", "description": "Stały wydatek miesięczny, kopiowany do kolejnego miesiąca." }
+      }
+    },
+    "add_income": {
+      "name": "Dodaj przychód",
+      "description": "Dodaje przychód do bieżącego miesiąca.",
+      "fields": {
+        "config_entry_id": { "name": "Konto", "description": "Potrzebne tylko przy kilku kontach." },
+        "value": { "name": "Kwota", "description": "Otrzymana kwota." },
+        "comment": { "name": "Komentarz", "description": "Opcjonalna notatka." },
+        "date": { "name": "Data", "description": "Domyślnie dzisiaj." },
+        "is_salary": { "name": "Pensja", "description": "Pensja, kopiowana do kolejnego miesiąca." }
+      }
+    }
+  }
+}

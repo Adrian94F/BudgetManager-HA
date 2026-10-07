@@ -1,0 +1,48 @@
+# Example Lovelace view for the account "alice" with English entity names;
+# replace budget_manager_alice_ with the prefix Home Assistant gave yours.
+title: Budget
+path: budget
+icon: mdi:wallet
+cards:
+  - type: gauge
+    name: Daily allowance used
+    entity: sensor.budget_manager_alice_daily_allowance_used
+    min: 0
+    max: 150
+    needle: true
+    severity:
+      green: 0
+      yellow: 70
+      red: 100
+
+  - type: entities
+    title: This month
+    entities:
+      - sensor.budget_manager_alice_balance
+      - sensor.budget_manager_alice_daily_allowance
+      - sensor.budget_manager_alice_spent_today
+      - sensor.budget_manager_alice_days_left
+      - number.budget_manager_alice_planned_savings
+      - binary_sensor.budget_manager_alice_over_budget
+
+  - type: tile
+    entity: sensor.budget_manager_alice_last_expense
+    features_position: bottom
+
+  - type: markdown
+    title: Monthly history
+    content: |
+      {% set h = states.sensor.budget_manager_alice_average_monthly_balance.attributes %}
+      | Month | Incomes | Expenses | Balance |
+      |---|--:|--:|--:|
+      {% for i in range(h.labels | count) | reverse -%}
+      | {{ h.labels[i] }} | {{ h.incomes[i] }} | {{ h.expenses[i] }} | {{ h.balances[i] }} |
+      {% endfor %}
+
+  - type: statistics-graph
+    title: Balance over time
+    entities:
+      - sensor.budget_manager_alice_balance
+      - sensor.budget_manager_alice_daily_allowance
+    stat_types: [mean]
+    period: day

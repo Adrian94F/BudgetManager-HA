@@ -1,0 +1,95 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to Budget Manager",
+        "data": {
+          "url": "Server URL",
+          "username": "Username",
+          "password": "Password",
+          "verify_ssl": "Verify SSL certificate"
+        },
+        "data_description": {
+          "url": "For example https://budget.example.com",
+          "password": "Used once to sign in; only a refresh token is stored."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Sign in again",
+        "description": "The session of {username} has expired. Enter the password to sign in again.",
+        "data": {
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect",
+      "invalid_auth": "Invalid username or password",
+      "unknown": "Unexpected error"
+    },
+    "abort": {
+      "already_configured": "This account is already configured",
+      "reauth_successful": "Signed in again"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "balance": { "name": "Balance" },
+      "max_daily": { "name": "Daily allowance" },
+      "today_spendings": { "name": "Spent today" },
+      "today_percent": { "name": "Daily allowance used" },
+      "days_left": { "name": "Days left" },
+      "all_incomes": { "name": "Incomes" },
+      "all_expenses": { "name": "Expenses" },
+      "monthly_expenses": { "name": "Recurring expenses" },
+      "daily_expenses": { "name": "Daily expenses" },
+      "last_expense": { "name": "Last expense" },
+      "average_balance": { "name": "Average monthly balance" },
+      "category": { "name": "Spent on {category}" }
+    },
+    "binary_sensor": {
+      "over_budget": { "name": "Over budget" },
+      "daily_limit_exceeded": { "name": "Daily allowance exceeded" },
+      "server": { "name": "Server" }
+    },
+    "number": {
+      "planned_savings": { "name": "Planned savings" }
+    }
+  },
+  "exceptions": {
+    "no_single_account": {
+      "message": "Name the Budget Manager account to use: none or several are set up."
+    },
+    "date_outside_month": {
+      "message": "{date} is outside the month going on."
+    },
+    "unknown_category": {
+      "message": "There is no category {category}."
+    }
+  },
+  "services": {
+    "add_expense": {
+      "name": "Add expense",
+      "description": "Adds an expense to the month going on.",
+      "fields": {
+        "config_entry_id": { "name": "Account", "description": "Needed only when several accounts are set up." },
+        "value": { "name": "Amount", "description": "The amount spent." },
+        "category": { "name": "Category", "description": "Category name or id." },
+        "comment": { "name": "Comment", "description": "Optional note." },
+        "date": { "name": "Date", "description": "Defaults to today." },
+        "is_monthly": { "name": "Recurring", "description": "A recurring monthly expense, copied to the next month." }
+      }
+    },
+    "add_income": {
+      "name": "Add income",
+      "description": "Adds an income to the month going on.",
+      "fields": {
+        "config_entry_id": { "name": "Account", "description": "Needed only when several accounts are set up." },
+        "value": { "name": "Amount", "description": "The amount received." },
+        "comment": { "name": "Comment", "description": "Optional note." },
+        "date": { "name": "Date", "description": "Defaults to today." },
+        "is_salary": { "name": "Salary", "description": "A salary, copied to the next month." }
+      }
+    }
+  }
+}
