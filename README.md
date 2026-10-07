@@ -99,3 +99,7 @@ The script bumps `version` in `manifest.json`, commits, tags `vX.Y.Z` and
 pushes; the *Release* workflow then publishes the GitHub release, which HACS
 offers as an update. Run `./release.sh 0.1.0` for the first release: it tags
 the current version without bumping it.
+
+## License
+
+[Apache License 2.0](LICENSE)
