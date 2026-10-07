@@ -32,6 +32,22 @@
       "reauth_successful": "Signed in again"
     }
   },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Budget Manager options",
+        "data": {
+          "scan_interval": "Polling interval"
+        },
+        "data_description": {
+          "scan_interval": "How often the server is asked for new figures; at least {min_seconds} seconds. Changes made from Home Assistant show up at once anyway."
+        }
+      }
+    },
+    "error": {
+      "interval_too_short": "The interval must be at least {min_seconds} seconds."
+    }
+  },
   "entity": {
     "sensor": {
       "balance": { "name": "Balance" },

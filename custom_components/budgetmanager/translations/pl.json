@@ -32,6 +32,22 @@
       "reauth_successful": "Zalogowano ponownie"
     }
   },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opcje Budget Manager",
+        "data": {
+          "scan_interval": "Częstotliwość odpytywania"
+        },
+        "data_description": {
+          "scan_interval": "Jak często pobierać z serwera nowe dane; co najmniej {min_seconds} sekund. Zmiany wprowadzone z Home Assistanta i tak widać od razu."
+        }
+      }
+    },
+    "error": {
+      "interval_too_short": "Interwał musi wynosić co najmniej {min_seconds} sekund."
+    }
+  },
   "entity": {
     "sensor": {
       "balance": { "name": "Bilans" },

@@ -2,13 +2,14 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from datetime import date
+from datetime import date, timedelta
 from unittest.mock import AsyncMock
 
 import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
+from homeassistant.const import CONF_SCAN_INTERVAL
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ServiceValidationError
 
@@ -193,3 +194,26 @@ async def test_unload(
     await setup_integration(hass, config_entry)
     assert await hass.config_entries.async_unload(config_entry.entry_id)
     assert config_entry.state is ConfigEntryState.NOT_LOADED
+
+
+async def test_scan_interval_from_options(
+    hass: HomeAssistant, mock_api: AsyncMock, config_entry: MockConfigEntry
+) -> None:
+    await setup_integration(hass, config_entry)
+    coordinator = config_entry.runtime_data
+    assert coordinator.update_interval == timedelta(minutes=5)
+    polls = mock_api.get_summary.await_count
+
+    # a rotated refresh token updates the entry too, but doesn't poll
+    hass.config_entries.async_update_entry(
+        config_entry, data={**config_entry.data, CONF_REFRESH_TOKEN: "refresh-2"})
+    await hass.async_block_till_done()
+    assert mock_api.get_summary.await_count == polls
+
+    hass.config_entries.async_update_entry(
+        config_entry,
+        options={CONF_SCAN_INTERVAL: {"hours": 1, "minutes": 0, "seconds": 30}})
+    await hass.async_block_till_done(wait_background_tasks=True)
+
+    assert coordinator.update_interval == timedelta(hours=1, seconds=30)
+    assert config_entry.state is ConfigEntryState.LOADED

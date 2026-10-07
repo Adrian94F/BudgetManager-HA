@@ -2,10 +2,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import timedelta
 import logging
 from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import CONF_SCAN_INTERVAL
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import (
@@ -14,11 +16,20 @@ from homeassistant.helpers.update_coordinator import (
 )
 
 from .api import BudgetManagerApi, BudgetManagerAuthError, BudgetManagerError
-from .const import CONF_REFRESH_TOKEN, DOMAIN, UPDATE_INTERVAL
+from .const import CONF_REFRESH_TOKEN, DEFAULT_SCAN_INTERVAL, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
 type BudgetManagerConfigEntry = ConfigEntry[BudgetManagerCoordinator]
+
+
+def scan_interval(entry: ConfigEntry) -> timedelta:
+    """The polling interval from the entry's options.
+
+    Stored as the duration selector gives it: ``{"hours", "minutes", "seconds"}``.
+    """
+    duration = entry.options.get(CONF_SCAN_INTERVAL)
+    return timedelta(**duration) if duration else DEFAULT_SCAN_INTERVAL
 
 
 @dataclass
@@ -55,9 +66,22 @@ class BudgetManagerCoordinator(DataUpdateCoordinator[BudgetManagerData]):
             _LOGGER,
             config_entry=entry,
             name=DOMAIN,
-            update_interval=UPDATE_INTERVAL,
+            update_interval=scan_interval(entry),
         )
         self.api = api
+
+    @callback
+    def apply_options(self) -> None:
+        """Poll at the interval set in the options, starting now.
+
+        The entry is also updated each time the refresh token rotates, so
+        nothing happens unless the interval changed.
+        """
+        interval = scan_interval(self.config_entry)
+        if interval != self.update_interval:
+            self.update_interval = interval
+            # Reschedules the next poll from now at the new interval.
+            self.hass.async_create_task(self.async_request_refresh())
 
     @callback
     def persist_refresh_token(self, token: str) -> None:

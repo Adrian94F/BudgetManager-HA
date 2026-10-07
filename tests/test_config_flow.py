@@ -10,6 +10,7 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 from homeassistant import config_entries
 from homeassistant.const import (
     CONF_PASSWORD,
+    CONF_SCAN_INTERVAL,
     CONF_URL,
     CONF_USERNAME,
     CONF_VERIFY_SSL,
@@ -125,3 +126,36 @@ async def test_reauth_replaces_refresh_token(
     assert result["reason"] == "reauth_successful"
     assert config_entry.data[CONF_REFRESH_TOKEN] == "refresh-new"
     flow_api.login.assert_awaited_once_with("alice", "secret")
+
+
+async def test_options_set_scan_interval(
+    hass: HomeAssistant, config_entry: MockConfigEntry
+) -> None:
+    config_entry.add_to_hass(hass)
+    result = await hass.config_entries.options.async_init(config_entry.entry_id)
+    assert result["type"] is FlowResultType.FORM
+    key = next(k for k in result["data_schema"].schema if k == CONF_SCAN_INTERVAL)
+    # the default, five minutes
+    assert key.description == {"suggested_value": {
+        "hours": 0, "minutes": 5, "seconds": 0}}
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"], {CONF_SCAN_INTERVAL: {"minutes": 90}})
+
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert config_entry.options == {CONF_SCAN_INTERVAL: {
+        "hours": 1, "minutes": 30, "seconds": 0}}
+
+
+async def test_options_reject_too_short_interval(
+    hass: HomeAssistant, config_entry: MockConfigEntry
+) -> None:
+    config_entry.add_to_hass(hass)
+    result = await hass.config_entries.options.async_init(config_entry.entry_id)
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"], {CONF_SCAN_INTERVAL: {"seconds": 5}})
+
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_SCAN_INTERVAL: "interval_too_short"}
+    assert result["description_placeholders"] == {"min_seconds": "10"}

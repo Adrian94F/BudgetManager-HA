@@ -48,7 +48,9 @@ All figures are for the month going on today and match the Summary page.
 | `number.*_planned_savings` | Planned savings, editable |
 
 The server is polled every 5 minutes and right after any change made from
-Home Assistant.
+Home Assistant. To poll more or less often, open *Settings → Devices &
+services → Budget Manager → Configure* and set the interval in hours, minutes
+and seconds (at least 10 seconds). It takes effect at once, without a restart.
 
 ## Actions
 

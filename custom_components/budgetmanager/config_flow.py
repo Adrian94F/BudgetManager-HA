@@ -6,22 +6,32 @@ used once to obtain the token pair and then forgotten.
 from __future__ import annotations
 
 from collections.abc import Mapping
+from datetime import timedelta
 import logging
 from typing import Any
 
 import voluptuous as vol
 
-from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
+from homeassistant.config_entries import (
+    ConfigEntry,
+    ConfigFlow,
+    ConfigFlowResult,
+    OptionsFlow,
+)
 from homeassistant.const import (
     CONF_PASSWORD,
+    CONF_SCAN_INTERVAL,
     CONF_URL,
     CONF_USERNAME,
     CONF_VERIFY_SSL,
 )
+from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.selector import DurationSelector, DurationSelectorConfig
 
 from .api import BudgetManagerApi, BudgetManagerAuthError, BudgetManagerError
-from .const import CONF_REFRESH_TOKEN, DOMAIN
+from .const import CONF_REFRESH_TOKEN, DOMAIN, MIN_SCAN_INTERVAL
+from .coordinator import scan_interval
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -36,9 +46,28 @@ USER_SCHEMA = vol.Schema({
 
 REAUTH_SCHEMA = vol.Schema({vol.Required(CONF_PASSWORD): str})
 
+OPTIONS_SCHEMA = vol.Schema({
+    vol.Required(CONF_SCAN_INTERVAL): DurationSelector(
+        DurationSelectorConfig(enable_day=False)),
+})
+
+
+def _as_duration(interval: timedelta) -> dict[str, int]:
+    total = int(interval.total_seconds())
+    return {
+        "hours": total // 3600,
+        "minutes": total % 3600 // 60,
+        "seconds": total % 60,
+    }
+
 
 class BudgetManagerConfigFlow(ConfigFlow, domain=DOMAIN):
     VERSION = 1
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry: ConfigEntry) -> OptionsFlow:
+        return BudgetManagerOptionsFlow()
 
     async def _async_login(
         self, url: str, username: str, password: str, verify_ssl: bool
@@ -113,5 +142,35 @@ class BudgetManagerConfigFlow(ConfigFlow, domain=DOMAIN):
             step_id="reauth_confirm",
             data_schema=REAUTH_SCHEMA,
             description_placeholders={"username": entry.data[CONF_USERNAME]},
+            errors=errors,
+        )
+
+
+class BudgetManagerOptionsFlow(OptionsFlow):
+    """How often the server is polled."""
+
+    async def async_step_init(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        errors: dict[str, str] = {}
+        if user_input is not None:
+            interval = timedelta(**user_input[CONF_SCAN_INTERVAL])
+            if interval < MIN_SCAN_INTERVAL:
+                errors[CONF_SCAN_INTERVAL] = "interval_too_short"
+            else:
+                # Normalised, so 90 minutes shows as 1:30:00 next time.
+                return self.async_create_entry(
+                    data={CONF_SCAN_INTERVAL: _as_duration(interval)})
+
+        return self.async_show_form(
+            step_id="init",
+            data_schema=self.add_suggested_values_to_schema(
+                OPTIONS_SCHEMA,
+                user_input or {
+                    CONF_SCAN_INTERVAL: _as_duration(
+                        scan_interval(self.config_entry))},
+            ),
+            description_placeholders={
+                "min_seconds": str(int(MIN_SCAN_INTERVAL.total_seconds()))},
             errors=errors,
         )

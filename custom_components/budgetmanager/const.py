@@ -6,9 +6,11 @@ DOMAIN: Final = "budgetmanager"
 
 CONF_REFRESH_TOKEN: Final = "refresh_token"
 
-# The server throttles a user at 120 requests a minute; budget figures change
-# only when someone adds an entry, so a few minutes is plenty.
-UPDATE_INTERVAL: Final = timedelta(minutes=5)
+# The server throttles a user at 120 requests a minute and a poll makes two;
+# budget figures change only when someone adds an entry, so a few minutes is
+# plenty. The user can change it in the integration's options.
+DEFAULT_SCAN_INTERVAL: Final = timedelta(minutes=5)
+MIN_SCAN_INTERVAL: Final = timedelta(seconds=10)
 
 SERVICE_ADD_EXPENSE: Final = "add_expense"
 SERVICE_ADD_INCOME: Final = "add_income"
