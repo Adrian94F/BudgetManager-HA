@@ -10,7 +10,7 @@
           "verify_ssl": "Weryfikuj certyfikat SSL"
         },
         "data_description": {
-          "url": "Na przykład https://budget.example.com",
+          "url": "Na przykład {example_url}",
           "password": "Używane tylko do zalogowania; zapisywany jest jedynie refresh token."
         }
       },

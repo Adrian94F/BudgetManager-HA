@@ -56,6 +56,11 @@ async def test_user_flow_stores_token_not_password(
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER})
     assert result["type"] is FlowResultType.FORM
+    assert result["description_placeholders"] == {
+        "example_url": "https://budget.frydmanski.cc"}
+    url_key = next(k for k in result["data_schema"].schema if k == CONF_URL)
+    assert url_key.description == {
+        "suggested_value": "https://budget.frydmanski.cc"}
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"], USER_INPUT)

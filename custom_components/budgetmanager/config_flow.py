@@ -25,6 +25,8 @@ from .const import CONF_REFRESH_TOKEN, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
+DEFAULT_URL = "https://budget.frydmanski.cc"
+
 USER_SCHEMA = vol.Schema({
     vol.Required(CONF_URL): str,
     vol.Required(CONF_USERNAME): str,
@@ -82,7 +84,9 @@ class BudgetManagerConfigFlow(ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user",
             data_schema=self.add_suggested_values_to_schema(
-                USER_SCHEMA, user_input),
+                USER_SCHEMA, user_input or {CONF_URL: DEFAULT_URL}),
+            # hassfest forbids URLs in translation strings.
+            description_placeholders={"example_url": DEFAULT_URL},
             errors=errors,
         )
 
