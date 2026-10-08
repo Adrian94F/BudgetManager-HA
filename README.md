@@ -33,7 +33,7 @@ All figures are for the month going on today and match the Summary page.
 
 | Entity | Description |
 |---|---|
-| `sensor.*_balance` | Incomes minus expenses minus planned savings |
+| `sensor.*_balance` | Incomes minus expenses; the figure after planned savings is in attributes |
 | `sensor.*_daily_allowance` | What may still be spent per day |
 | `sensor.*_spent_today` | Daily expenses dated today |
 | `sensor.*_daily_allowance_used` | Today's spending as % of the allowance |

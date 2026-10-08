@@ -48,7 +48,7 @@ def _month_attrs(data: BudgetManagerData) -> dict[str, Any] | None:
         "end_date": month["end_date"],
         "is_actual": data.summary["is_actual"],
         "planned_savings": data.summary["planned_savings"],
-        "actual_balance": data.summary["actual_balance"],
+        "balance_after_savings": data.summary["balance"],
     }
 
 
@@ -86,7 +86,8 @@ SENSORS: tuple[BudgetManagerSensorDescription, ...] = (
         translation_key="balance",
         monetary=True,
         state_class=SensorStateClass.TOTAL,
-        value_fn=_summary("balance"),
+        # Planned savings can still change, so the state leaves them out.
+        value_fn=_summary("actual_balance"),
         attrs_fn=_month_attrs,
     ),
     BudgetManagerSensorDescription(

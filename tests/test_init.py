@@ -30,7 +30,8 @@ async def test_sensors(
     await setup_integration(hass, config_entry)
 
     balance = hass.states.get(f"sensor.{PREFIX}_balance")
-    assert balance.state == "3645.0"
+    assert balance.state == "3945.0"
+    assert balance.attributes["balance_after_savings"] == 3645.0
     assert balance.attributes["unit_of_measurement"] == "PLN"
     assert balance.attributes["month_id"] == 7
     assert hass.states.get(f"sensor.{PREFIX}_daily_allowance").state == "151.88"
