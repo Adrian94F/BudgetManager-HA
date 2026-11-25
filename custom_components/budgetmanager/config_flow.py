@@ -1,8 +1,4 @@
-"""Config flow for Budget Manager.
-
-Only the URL, the username and a refresh token are stored; the password is
-used once to obtain the token pair and then forgotten.
-"""
+"""Config flow for Budget Manager."""
 from __future__ import annotations
 
 from collections.abc import Mapping
@@ -105,6 +101,7 @@ class BudgetManagerConfigFlow(ConfigFlow, domain=DOMAIN):
                     data={
                         CONF_URL: url,
                         CONF_USERNAME: username,
+                        CONF_PASSWORD: user_input[CONF_PASSWORD],
                         CONF_VERIFY_SSL: user_input[CONF_VERIFY_SSL],
                         CONF_REFRESH_TOKEN: token,
                     },
@@ -136,7 +133,12 @@ class BudgetManagerConfigFlow(ConfigFlow, domain=DOMAIN):
                 user_input[CONF_PASSWORD], entry.data.get(CONF_VERIFY_SSL, True))
             if token:
                 return self.async_update_reload_and_abort(
-                    entry, data_updates={CONF_REFRESH_TOKEN: token})
+                    entry,
+                    data_updates={
+                        CONF_PASSWORD: user_input[CONF_PASSWORD],
+                        CONF_REFRESH_TOKEN: token,
+                    },
+                )
 
         return self.async_show_form(
             step_id="reauth_confirm",

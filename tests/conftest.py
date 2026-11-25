@@ -9,7 +9,12 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from homeassistant.const import CONF_URL, CONF_USERNAME, CONF_VERIFY_SSL
+from homeassistant.const import (
+    CONF_PASSWORD,
+    CONF_URL,
+    CONF_USERNAME,
+    CONF_VERIFY_SSL,
+)
 from homeassistant.core import HomeAssistant
 
 from custom_components.budgetmanager.const import CONF_REFRESH_TOKEN, DOMAIN
@@ -66,6 +71,7 @@ def config_entry() -> MockConfigEntry:
         data={
             CONF_URL: "http://bm.local",
             CONF_USERNAME: "alice",
+            CONF_PASSWORD: "secret",
             CONF_VERIFY_SSL: True,
             CONF_REFRESH_TOKEN: "refresh-1",
         },

@@ -29,11 +29,16 @@ class BudgetManagerApi:
         session: aiohttp.ClientSession,
         url: str,
         refresh_token: str | None = None,
+        *,
+        username: str | None = None,
+        password: str | None = None,
         on_refresh_token: Callable[[str], None] | None = None,
     ) -> None:
         self._session = session
         self._url = url.rstrip("/")
         self._refresh_token = refresh_token
+        self._username = username
+        self._password = password
         self._access_token: str | None = None
         self._on_refresh_token = on_refresh_token
         self._refresh_lock = asyncio.Lock()
@@ -48,7 +53,7 @@ class BudgetManagerApi:
         self._on_refresh_token = on_refresh_token
 
     async def login(self, username: str, password: str) -> None:
-        """Obtain a token pair; the password itself is never stored."""
+        """Obtain a token pair using the supplied credentials."""
         data = await self._post_json(
             "/api/token/", {"username": username, "password": password})
         self._access_token = data["access"]
@@ -106,12 +111,24 @@ class BudgetManagerApi:
             if self._access_token != stale_access_token:
                 return
             if not self._refresh_token:
-                raise BudgetManagerAuthError("No refresh token")
-            data = await self._post_json(
-                "/api/token/refresh/", {"refresh": self._refresh_token})
+                await self._login_with_stored_credentials()
+                return
+            try:
+                data = await self._post_json(
+                    "/api/token/refresh/", {"refresh": self._refresh_token})
+            except BudgetManagerAuthError:
+                if self._username is None or self._password is None:
+                    raise
+                await self.login(self._username, self._password)
+                return
             self._access_token = data["access"]
             if "refresh" in data:
                 self._set_refresh_token(data["refresh"])
+
+    async def _login_with_stored_credentials(self) -> None:
+        if self._username is None or self._password is None:
+            raise BudgetManagerAuthError("No refresh token")
+        await self.login(self._username, self._password)
 
     def _set_refresh_token(self, token: str) -> None:
         self._refresh_token = token

@@ -71,6 +71,7 @@ async def test_user_flow_stores_token_not_password(
     assert result["data"] == {
         CONF_URL: "http://bm.local",
         CONF_USERNAME: "alice",
+        CONF_PASSWORD: "secret",
         CONF_VERIFY_SSL: True,
         CONF_REFRESH_TOKEN: "refresh-new",
     }
@@ -125,6 +126,7 @@ async def test_reauth_replaces_refresh_token(
     assert result["type"] is FlowResultType.ABORT
     assert result["reason"] == "reauth_successful"
     assert config_entry.data[CONF_REFRESH_TOKEN] == "refresh-new"
+    assert config_entry.data[CONF_PASSWORD] == "secret"
     flow_api.login.assert_awaited_once_with("alice", "secret")
 
 

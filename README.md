@@ -23,9 +23,11 @@ Then add the integration:
 [![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=budgetmanager)
 
 or go to *Settings → Devices & services → Add integration → Budget Manager*,
-and enter the server URL, username and password. The password is used once to
-sign in; only a refresh token is stored. If Home Assistant stays offline for
-longer than the token lives (7 days), it asks you to sign in again.
+and enter the server URL, username and password. The integration stores and
+rotates the refresh token whenever it refreshes the short-lived access token.
+The password is retained as a fallback so an expired refresh token can be
+replaced automatically without another manual sign-in. If the credentials
+themselves become invalid, Home Assistant asks you to authenticate again.
 
 ## Entities
 

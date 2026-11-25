@@ -1,7 +1,13 @@
 """The Budget Manager integration."""
 from __future__ import annotations
 
-from homeassistant.const import CONF_URL, CONF_VERIFY_SSL, Platform
+from homeassistant.const import (
+    CONF_PASSWORD,
+    CONF_URL,
+    CONF_USERNAME,
+    CONF_VERIFY_SSL,
+    Platform,
+)
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
@@ -31,7 +37,12 @@ async def async_setup_entry(
 ) -> bool:
     session = async_get_clientsession(hass, entry.data.get(CONF_VERIFY_SSL, True))
     api = BudgetManagerApi(
-        session, entry.data[CONF_URL], entry.data[CONF_REFRESH_TOKEN])
+        session,
+        entry.data[CONF_URL],
+        entry.data[CONF_REFRESH_TOKEN],
+        username=entry.data[CONF_USERNAME],
+        password=entry.data.get(CONF_PASSWORD),
+    )
     coordinator = BudgetManagerCoordinator(hass, entry, api)
     api.set_refresh_token_listener(coordinator.persist_refresh_token)
 

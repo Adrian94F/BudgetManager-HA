@@ -14,6 +14,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ServiceValidationError
 
 from custom_components.budgetmanager.api import (
+    BudgetManagerApi,
     BudgetManagerAuthError,
     BudgetManagerError,
 )
@@ -187,6 +188,50 @@ async def test_rotated_refresh_token_is_persisted(
     await setup_integration(hass, config_entry)
     config_entry.runtime_data.persist_refresh_token("refresh-2")
     assert config_entry.data[CONF_REFRESH_TOKEN] == "refresh-2"
+
+
+async def test_expired_refresh_token_logs_in_again() -> None:
+    tokens: list[str] = []
+    api = BudgetManagerApi(
+        AsyncMock(),
+        "http://bm.local",
+        "refresh-1",
+        username="alice",
+        password="secret",
+        on_refresh_token=tokens.append,
+    )
+    api._post_json = AsyncMock(side_effect=[  # type: ignore[method-assign]
+        BudgetManagerAuthError("expired"),
+        {"access": "access-2", "refresh": "refresh-2"},
+    ])
+
+    await api._refresh(None)
+
+    assert api.refresh_token == "refresh-2"
+    assert tokens == ["refresh-2"]
+    assert api._post_json.await_args_list[0].args == (  # type: ignore[attr-defined]
+        "/api/token/refresh/", {"refresh": "refresh-1"})
+    assert api._post_json.await_args_list[1].args == (  # type: ignore[attr-defined]
+        "/api/token/", {"username": "alice", "password": "secret"})
+
+
+async def test_refresh_rotation_is_persisted_immediately() -> None:
+    tokens: list[str] = []
+    api = BudgetManagerApi(
+        AsyncMock(),
+        "http://bm.local",
+        "refresh-1",
+        on_refresh_token=tokens.append,
+    )
+    api._post_json = AsyncMock(return_value={  # type: ignore[method-assign]
+        "access": "access-2",
+        "refresh": "refresh-2",
+    })
+
+    await api._refresh(None)
+
+    assert api.refresh_token == "refresh-2"
+    assert tokens == ["refresh-2"]
 
 
 async def test_unload(
