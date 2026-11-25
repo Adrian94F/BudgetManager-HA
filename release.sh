@@ -48,7 +48,10 @@ read -r -p "Release $current -> $version as $tag and push? [y/N] " answer
 [ "$answer" = "y" ] || [ "$answer" = "Y" ] || die "aborted"
 
 if [ "$version" != "$current" ]; then
-    sed -i "s/\"version\": *\"$current\"/\"version\": \"$version\"/" "$MANIFEST"
+    sed -i.bak \
+        -e "s/\"version\": *\"$current\"/\"version\": \"$version\"/" \
+        "$MANIFEST"
+    rm -f "$MANIFEST.bak"
     git add "$MANIFEST"
     git commit --quiet -m "Release $tag"
 fi
